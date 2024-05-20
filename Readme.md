@@ -318,14 +318,52 @@ db.comments.aggregate([
 
 ```
 
-<img src="" alt="aggregation $lookup"/>
+
+![aggregation $lookup](https://github.com/54ntu/mongodb-tuts/assets/101068062/cbb33e40-3dd8-49db-80ba-026e585ebd2e)
+
+
+<hr>
+<h3>Schemas for comments and movies collection</h3>
+<hr>
+
+```shell
+const commentsSchema= new mongoose.Schema(
+{
+comment:{
+      type:String
+    },
+movie_id:{
+  type:mongoose.schema.Types.ObjectID,
+  ref:'movies'
+  }
+}
+)
+
+const comments = mongoose.model('comments',commentSchema)
 
 
 
 
+//movies schema
 
+const moviesSchema = new mongoose.Schema(
+{
+title:{type:String},
+year:{type:Integer}
+}
+)
+const movies = mongoose.model('movies',moviesSchema)
 
+```
 
+<hr>
+<h1>Explanation of lookUp aggregation code given above</h1>
+<hr>
+<p>when we want to fetch the comment details from the comments collection we also need to fetch the data from the movies collection.
 
+because we have a foreignfield movie_id in comments table.</p>
+<p>in from fields : we put movies collection name because we want details from the movie collection based on foreignfield in the comments collection</p>
+<p>foreignfields is movie_id because it is a foreign key value</p>
+<p>localfield  is _id which is localfield of movies collection</p>
 
 
