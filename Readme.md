@@ -132,6 +132,195 @@ $set - to update the string values
 $unset - to clear the field from the document
 ```
 
+<hr>
+<h1>Aggregation pipeline in Mongo db</h1>
+<p>Aggregation pipelines allow us to group, sort, perform calculations and analyze data. Aggregation pipelines can have one or more "stages". The order of these stages are important. Each stage acts upon the results of the previous stage.</p>
+
+```shell
+
+db.collection_name.aggregate([
+//first stage to match the data 
+{
+$match:{condition}
+},
+
+//stage 2 will be group all the documents and perform some operations like calculating the total of the data.
+
+{
+$group:{_id:"$category or other value", totalviews:{$sum:"$views"}}
+}
+
+//group will create another group of document on basis of unique id
+
+])
+```
+
+<h2>Aggregation $group</h2>
+<p>This aggregation stage groups documents by the unique "_id" expression</p>
+
+```shell
+db.collection_name.aggregae([
+{
+$group:{_id:"$category"}
+}
+])
+```
+
+<hr>
+<h2>Aggregation $limit</h2>
+<p>This stage limit the number of documents passed to the next stage.</p>
+<hr>
+
+```shell
+
+db.collection_name.aggregate([
+{ $limit:1 }
+])
+
+//this will return only one document from the collection
+
+```
+
+<hr>
+<h2>Aggregation $project</h2>
+<p>This aggregation stage  passes only the specified fields to the next aggregation stage.</p>
+<hr>
+
+```shell
+db.restaurants.aggregate([
+
+{
+ $project:{
+ "name":1,
+ "cuisine":1,
+ "address":1
+  }
+},
+{
+$limit: 5
+}
+])
+
+//here restaurants is a collection name
+// 1 refers that we want to display the data
+//if we do not want to send the data to the next stage then that value can be changed to 0
+```
+
+<hr>
+<h2>Aggregation $sort</h2>
+<p>This aggregation stage groups sort all documents in the specified sort order.</p>
+<hr>
+
+```shell
+db.listingsAndReviews.aggregate([
+
+{
+$sort:{"accommodates":-1}
+},
+{
+  $project:{
+  "name":1,
+  "accommodates":1,
+  }
+},
+{
+$limit:5
+}
+])
+
+```
+
+<hr>
+<h2>Aggregation $match</h2>
+<p>this aggregation stage behaves like a find. It will filter documents that match the query provided</p>
+
+```shell
+db.listingsAndReviews.aggregate([
+{
+$match:{property_type:"House"}
+},
+{$limit:2},
+{
+$project:{
+"name":1,
+"bedrooms":1,
+"price":1,
+}
+}
+])
+
+```
+<hr>
+<h2>Aggregation $addFields</h2>
+<p>This aggregation stage adds new fields to documents.</p>
+<hr>
+
+```shell
+db.restaurants.aggregate([
+  {
+    $addFields:{
+          avgGrade:{ $avg: "$grades.score"}
+       }
+   },
+ {
+   $project:{
+ "name":1,
+"avgGrade":1,
+}
+},
+{$limit:5}
+])
+
+
+```
+
+<hr>
+<h2>Aggregation $count</h2>
+<p>This aggregation stage counts the total amount of documents passed from the previous stage</p>
+<hr>
+
+```shell
+db.restaurants.aggregate([
+{
+$match:{"cuisine":"chinese"}
+},
+{
+$count:"totalChinese"
+}
+])
+```
+
+<hr>
+<h2>Aggregation $lookup</h2>
+<p>This aggregation stage performs a left outer join to a collection in the same database.</p>
+<h5>There are four required fieilds </h5>
+<ul>
+ <li>from : The collection to use for lookup in the same database</li>
+ <li>LocalField: The field in the primary collection that can be used as a unique identifier  in the form collection.</li>
+ <li>foreignField: the field in the from collection that can be used as a unique identifier in the primary collection</li>
+ <li>as: the name of the new field that will contain the matching documents  from the  from collection</li>
+</ul>
+
+```shell
+db.comments.aggregate([
+  {
+    $lookup: {
+      from: "movies",
+      localField: "movie_id",
+      foreignField: "_id",
+      as: "movie_details",
+    },
+  },
+  {
+    $limit: 1
+  }
+])
+
+```
+
+<img src="" alt="aggregation $lookup"/>
+
+
 
 
 
